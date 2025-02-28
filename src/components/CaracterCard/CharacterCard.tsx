@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import FavoriteIcon from '../FavoriteIcon/FavoriteIcon';
 import styles from './CharacterCard.module.scss';
 
 interface Character {
@@ -10,15 +10,21 @@ interface Character {
 
 interface CharacterCardProps {
   character: Character;
+  isFavorite: boolean;
+  onToggleFavorite: (id: string) => void;
 }
 
-function CharacterCard({ character }: CharacterCardProps) {
+function CharacterCard({ character, isFavorite, onToggleFavorite }: CharacterCardProps) {
   return (
-    <Link to={`/character/${character.id}`} className={styles.card}>
+    <div className={styles.card}>
       <img src={character.image} alt={character.name} />
       <h2>{character.name}</h2>
       <p>{character.species}</p>
-    </Link>
+      <FavoriteIcon
+        isFavorite={isFavorite}
+        onClick={() => onToggleFavorite(character.id)}
+      />
+    </div>
   );
 }
 

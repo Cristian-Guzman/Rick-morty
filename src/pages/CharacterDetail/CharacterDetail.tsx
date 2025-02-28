@@ -1,6 +1,7 @@
-import { useQuery, gql } from '@apollo/client';
-import { useParams } from 'react-router-dom';
-import styles from './CharacterDetail.module.scss';
+import { useState } from "react";
+import { useQuery, gql } from "@apollo/client";
+import { useParams } from "react-router-dom";
+import styles from "./CharacterDetail.module.scss";
 
 interface Character {
   id: string;
@@ -19,10 +20,6 @@ interface Character {
 
 interface CharacterData {
   character: Character;
-}
-
-interface CharacterVars {
-  id: string;
 }
 
 const GET_CHARACTER_DETAILS = gql`
@@ -46,21 +43,29 @@ const GET_CHARACTER_DETAILS = gql`
 
 function CharacterDetail() {
   const { id } = useParams<{ id: string }>();
+  const { loading, error, data } = useQuery<CharacterData>(
+    GET_CHARACTER_DETAILS,
+    {
+      variables: { id },
+    }
+  );
 
-  if (!id) {
-    return <p>No character ID provided</p>;
-  }
-
-  const { loading, error, data } = useQuery<CharacterData, CharacterVars>(GET_CHARACTER_DETAILS, {
-    variables: { id },
-  });
+  const [comments, setComments] = useState<string[]>([]);
+  const [newComment, setNewComment] = useState("");
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
 
   if (!data || !data.character) return <p>No character data found</p>;
 
-  const { character } = data;
+  const character = data.character;
+
+  const handleAddComment = () => {
+    if (newComment.trim()) {
+      setComments([...comments, newComment.trim()]);
+      setNewComment("");
+    }
+  };
 
   return (
     <div className={styles.detailContainer}>
@@ -71,6 +76,26 @@ function CharacterDetail() {
       <p>Gender: {character.gender}</p>
       <p>Origin: {character.origin.name}</p>
       <p>Location: {character.location.name}</p>
+
+      {/* Sección de comentarios */}
+      <div className={styles.commentsSection}>
+        <h2>Comments</h2>
+        <div className={styles.commentsList}>
+          {comments.map((comment, index) => (
+            <div key={index} className={styles.comment}>
+              {comment}
+            </div>
+          ))}
+        </div>
+        <div className={styles.commentForm}>
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Add a comment..."
+          />
+          <button onClick={handleAddComment}>Add Comment</button>
+        </div>
+      </div>
     </div>
   );
 }

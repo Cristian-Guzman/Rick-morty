@@ -32,6 +32,7 @@ const GET_CHARACTERS = gql`
 function Home() {
   const { loading, error, data } = useQuery<CharactersData>(GET_CHARACTERS);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [favorites, setFavorites] = useState<string[]>([]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
@@ -45,6 +46,14 @@ function Home() {
       return b.name.localeCompare(a.name);
     }
   });
+
+  const toggleFavorite = (id: string) => {
+    if (favorites.includes(id)) {
+      setFavorites(favorites.filter((favId) => favId !== id));
+    } else {
+      setFavorites([...favorites, id]);
+    }
+  };
 
   return (
     <div>
@@ -61,7 +70,12 @@ function Home() {
       </div>
       <div className={styles.characterList}>
         {sortedCharacters.map((character) => (
-          <CharacterCard key={character.id} character={character} />
+          <CharacterCard
+            key={character.id}
+            character={character}
+            isFavorite={favorites.includes(character.id)}
+            onToggleFavorite={toggleFavorite}
+        />
         ))}
       </div>
     </div>
