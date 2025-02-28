@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import styles from './CharacterCard.module.scss';
 
 interface Character {
@@ -13,11 +14,11 @@ interface CharacterCardProps {
 
 function CharacterCard({ character }: CharacterCardProps) {
   return (
-    <div className={styles.card}>
+    <Link to={`/character/${character.id}`} className={styles.card}>
       <img src={character.image} alt={character.name} />
       <h2>{character.name}</h2>
       <p>{character.species}</p>
-    </div>
+    </Link>
   );
 }
 
