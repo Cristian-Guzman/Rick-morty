@@ -18,8 +18,10 @@ function CharacterCard({ character, isFavorite, onToggleFavorite }: CharacterCar
   return (
     <div className={styles.card}>
       <img src={character.image} alt={character.name} />
-      <h2>{character.name}</h2>
-      <p>{character.species}</p>
+      <div className={styles.header}>
+        <h2>{character.name}</h2>
+        <p>{character.species}</p>
+      </div>
       <FavoriteIcon
         isFavorite={isFavorite}
         onClick={() => onToggleFavorite(character.id)}

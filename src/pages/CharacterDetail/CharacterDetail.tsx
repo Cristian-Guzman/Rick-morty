@@ -77,7 +77,6 @@ function CharacterDetail() {
       <p>Origin: {character.origin.name}</p>
       <p>Location: {character.location.name}</p>
 
-      {/* Sección de comentarios */}
       <div className={styles.commentsSection}>
         <h2>Comments</h2>
         <div className={styles.commentsList}>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, gql } from "@apollo/client";
 import styles from "./Home.module.scss";
 import CharacterCard from "../../components/CaracterCard/CharacterCard";
+import SearchInput from "../../components/SearchInput/SearchInput";
 
 interface Character {
   id: string;
@@ -34,6 +35,7 @@ const GET_CHARACTERS = gql`
 function Home() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [filter, setFilter] = useState<boolean>(false);
   const [filters, setFilters] = useState<{
     status: string;
     species: string;
@@ -73,52 +75,72 @@ function Home() {
     setFilters({ ...filters, [name]: value });
   };
 
+  const starredCharacters = sortedCharacters.filter((character) =>
+    favorites.includes(character.id)
+  );
+  const unstarredCharacters = sortedCharacters.filter(
+    (character) => !favorites.includes(character.id)
+  );
+
   return (
-    <div>
-      <div className={styles.filterContainer}>
-        <select
-          name="status"
-          value={filters.status}
-          onChange={handleFilterChange}
-        >
-          <option value="">All Statuses</option>
-          <option value="alive">Alive</option>
-          <option value="dead">Dead</option>
-          <option value="unknown">Unknown</option>
-        </select>
-        <select
-          name="species"
-          value={filters.species}
-          onChange={handleFilterChange}
-        >
-          <option value="">All Species</option>
-          <option value="human">Human</option>
-          <option value="alien">Alien</option>
-        </select>
-        <select
-          name="gender"
-          value={filters.gender}
-          onChange={handleFilterChange}
-        >
-          <option value="">All Genders</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="unknown">Unknown</option>
-        </select>
-      </div>
-      <div className={styles.sortContainer}>
-        <label htmlFor="sortOrder">Sort by name:</label>
-        <select
-          id="sortOrder"
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
-        >
-          <option value="asc">A-Z</option>
-          <option value="desc">Z-A</option>
-        </select>
+    <div className={styles.container}>
+      <h1>Rick and Morty list</h1>
+      <SearchInput setFilter={setFilter} filter={filter} />
+      {filter === true ? (
+        <div className={styles.filterContainer}>
+          <select
+            name="status"
+            value={filters.status}
+            onChange={handleFilterChange}
+          >
+            <option value="">All Statuses</option>
+            <option value="alive">Alive</option>
+            <option value="dead">Dead</option>
+            <option value="unknown">Unknown</option>
+          </select>
+          <select
+            name="species"
+            value={filters.species}
+            onChange={handleFilterChange}
+          >
+            <option value="">All Species</option>
+            <option value="human">Human</option>
+            <option value="alien">Alien</option>
+          </select>
+          <select
+            name="gender"
+            value={filters.gender}
+            onChange={handleFilterChange}
+          >
+            <option value="">All Genders</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+      ) : null}
+      {starredCharacters.length > 0 && (
+        <>
+          <div className={styles.sectionTitle} style={{ color: "#6B7280" }}>
+            Starred Characters
+          </div>
+          <div className={styles.characterList}>
+            {starredCharacters.map((character) => (
+              <CharacterCard
+                key={character.id}
+                character={character}
+                isFavorite={favorites.includes(character.id)}
+                onToggleFavorite={toggleFavorite}
+              />
+            ))}
+          </div>
+        </>
+      )}
+      <div className={styles.sectionTitle} style={{ color: "#6B7280" }}>
+        Characters
       </div>
       <div className={styles.characterList}>
-        {sortedCharacters.map((character) => (
+        {unstarredCharacters.map((character) => (
           <CharacterCard
             key={character.id}
             character={character}
